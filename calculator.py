@@ -7,11 +7,7 @@ print("===============================")
 print("     Net Profit Calculator     ")
 print("===============================")
 
-revenue = int(input("Revenue: R$ "))
-is_foreign_revenue = input("Is it foreign revenue? [Y/N]: ")
-
-if (is_foreign_revenue != "Y" and is_foreign_revenue != "N"):
-  raise Exception("Unknown answer")
+revenue = float(input("Revenue: R$ "))
 
 pro_labore = get_pro_labore(revenue)
 
@@ -20,7 +16,7 @@ inss = get_inss(pro_labore)
 pro_labore_minus_inss = pro_labore - inss
 irff = get_irrf(pro_labore_minus_inss)
 
-das = get_das(revenue, is_foreign_revenue)
+das = get_das(revenue)
 
 discounts = inss + irff + das
 net_profit = revenue - discounts

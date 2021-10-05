@@ -31,11 +31,10 @@ def get_irrf(pro_labore_minus_inss):
       "deduction": 869.36
     }
   ]
-
   corresponding_range = None
 
   for range in irff_table:
-    if pro_labore_minus_inss > range["from"] and (range["to"] is None or pro_labore_minus_inss < range["to"]):
+    if pro_labore_minus_inss > range["from"] and (range["to"] is None or pro_labore_minus_inss <= range["to"]):
       corresponding_range = range
       break
 
