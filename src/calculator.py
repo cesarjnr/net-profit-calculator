@@ -1,30 +1,17 @@
-# from pro_labore import get_pro_labore
-# from inss import get_inss
-# from irff import get_irrf
-# from das import get_das
+from dotenv import load_dotenv
+from redis import Redis
+from os import environ
 
-# print("===============================")
-# print("     Net Profit Calculator     ")
-# print("===============================")
+load_dotenv()
 
-# revenue = float(input("Revenue: R$ "))
+redisClient = Redis(host=environ['REDIS_HOST'], decode_responses=True)
 
-# pro_labore = get_pro_labore(revenue)
+redisClient.set('foo', 'bar')
+result = redisClient.get('foo')
 
-# inss = get_inss(pro_labore)
+print('Result: ', result)
 
-# pro_labore_minus_inss = pro_labore - inss
-# irff = get_irrf(pro_labore_minus_inss)
+redisClient.delete('foo')
+result = redisClient.get('foo')
 
-# das = get_das(revenue)
-
-# discounts = inss + irff + das
-# net_profit = revenue - discounts
-
-# print("Pro-labore: R$ {:.2f}".format(pro_labore))
-# print("INSS: R$ {:.2f}".format(inss))
-# print("IRFF: R$ {:.2f}".format(irff))
-# print("DAS: R$ {:.2f}".format(das))
-# print("Discounts: R$ {:.2f}".format(discounts))
-# print("Net Profit: R$ {:.2f}".format(net_profit))
-# print("===============================")
+print('Result: ', result)
