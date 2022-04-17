@@ -8,12 +8,19 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'primary': 'rgb(20, 33, 61)',
-        'secondary': 'rgb(247, 197, 72)',
-        'secondary-transparent': 'rgba(247, 197, 72, .2)',
-        'white': colors.white
+        primary: {
+          50: 'rgb(234, 240, 255)',
+          100: 'rgb(197, 210, 236)',
+          800: 'rgb(16, 31, 61)',
+          900: 'rgb(6, 21, 51)'
+        },
+        secondary: {
+          400: 'rgb(247, 199, 33)'
+        }
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms')
+  ],
 }
