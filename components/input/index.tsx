@@ -1,3 +1,5 @@
+import { useFormContext } from "react-hook-form";
+
 export enum InputType {
   Text = 'text',
   Date = 'date'
@@ -10,6 +12,8 @@ interface Props {
 }
 
 export default function Input({ name, label, type }: Props) {
+  const { register } = useFormContext();
+  
   return (
     <div className="my-6">
       <label htmlFor={name}>{label}</label>
@@ -18,6 +22,7 @@ export default function Input({ name, label, type }: Props) {
         name={name}
         id={name}
         className="block w-full rounded-md bg-primary-50 border-transparent cursor-text focus:border-primary-800 focus:shadow-none focus:ring-primary-800"
+        {...register(name)}
       />
     </div>
   );
