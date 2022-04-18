@@ -1,11 +1,25 @@
 import { Fragment, useState } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
 
 import Modal from '../../components/modal';
+import Table from '../../components/table';
 import Button, { ButtonVariant, ButtonType } from '../../components/button';
 import Input, { InputType } from '../../components/input';
 
 export default function Earning() {
+  const { handleSubmit, ...rest } = useForm();
   const [showModal, setShowModal] = useState(false);
+  const tableHeaders = ['Date', 'Earning'];
+  const tableRows = [
+    { id: 1, date: '01/2022', value: 'R$12.000,00' },
+    { id: 2, date: '02/2022', value: 'R$12.000,00' },
+    { id: 3, date: '03/2022', value: 'R$18.000,00' },
+    { id: 4, date: '04/2022', value: 'R$8.000,00' },
+  ];
+  const tableFooter = { 'Total': 'R$50.000,00' };
+  const componentHandleSubmit = (data) => {
+    console.log(data);
+  };
 
   return (
     <Fragment>
@@ -18,60 +32,31 @@ export default function Earning() {
         />
       </div>
 
-      <table className="table-auto border border-primary-800 w-full">
-        <thead>
-          <tr className="bg-primary-800 text-secondary-400 text-sm">
-            <th className="border border-primary-800 p-3 font-medium">Date</th>
-            <th className="border border-primary-800 p-3 font-medium">Earning</th>
-          </tr>
-        </thead>
-        <tbody className="text-primary-800 text-sm">
-          <tr>
-            <td className="border border-primary-100 p-2">01/2022</td>
-            <td className="border border-primary-100 p-2">R$12.000,00</td>
-          </tr>
-          <tr>
-            <td className="border border-primary-100 p-2">02/2022</td>
-            <td className="border border-primary-100 p-2">R$12.000,00</td>
-          </tr>
-          <tr>
-            <td className="border border-primary-100 p-2">03/2022</td>
-            <td className="border border-primary-100 p-2">R$18.000,00</td>
-          </tr>
-          <tr>
-            <td className="border border-primary-100 p-2">04/2022</td>
-            <td className="border border-primary-100 p-2">R$8.000,00</td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr className="bg-primary-50 text-primary-800 text-sm font-medium">
-            <td className="border border-primary-100 p-2">Total</td>
-            <td className="border border-primary-100 p-2">R$50.000,00</td>
-          </tr>
-        </tfoot>
-      </table>
+      <Table headers={tableHeaders} bodyRows={tableRows} footerRow={tableFooter} />
 
       <Modal open={showModal} title="New Earning" onClose={() => setShowModal(false)}>
-        <form onSubmit={(e) => e.preventDefault()}>
-          <Input name='date' label='Date' type={InputType.Date} />
-          <Input name='value' label='Value (R$)' type={InputType.Text} />
+        <FormProvider handleSubmit={handleSubmit} {...rest}>
+          <form onSubmit={handleSubmit(componentHandleSubmit)}>
+            <Input name='date' label='Date' type={InputType.Date} />
+            <Input name='value' label='Value (R$)' type={InputType.Text} />
 
-          <div className="flex gap-5">
-            <Button
-              variant={ButtonVariant.Contained}
-              type={ButtonType.Submit}
-              text='Create'
-              fullWidth
-            />
-            <Button
-              variant={ButtonVariant.Outlined}
-              type={ButtonType.Button}
-              text='Cancel'
-              onClick={() => setShowModal(false)}
-              fullWidth
-            />
-          </div>
-        </form>
+            <div className="flex gap-5">
+              <Button
+                variant={ButtonVariant.Contained}
+                type={ButtonType.Submit}
+                text='Create'
+                fullWidth
+              />
+              <Button
+                variant={ButtonVariant.Outlined}
+                type={ButtonType.Button}
+                text='Cancel'
+                onClick={() => setShowModal(false)}
+                fullWidth
+              />
+            </div>
+          </form>
+        </FormProvider>
       </Modal>
     </Fragment>
   );
