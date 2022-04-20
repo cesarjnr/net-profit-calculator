@@ -1,3 +1,4 @@
+import useSwr from 'swr';
 import { Fragment, useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 
@@ -5,8 +6,13 @@ import Modal from '../../components/modal';
 import Table from '../../components/table';
 import Button, { ButtonVariant, ButtonType } from '../../components/button';
 import Input, { InputType } from '../../components/input';
+import { getEarnings, createEarning } from '../../lib/earnings';
 
 export default function Earning() {
+  const { data: earnings } = useSwr('/api/earnings', getEarnings);
+
+  console.log(earnings);
+
   const { handleSubmit, ...rest } = useForm();
   const [showModal, setShowModal] = useState(false);
   const tableHeaders = ['Date', 'Earning'];
