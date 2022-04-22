@@ -1,4 +1,4 @@
-import useSwr from 'swr';
+import useSwr, { mutate } from 'swr';
 import { Fragment, useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 
@@ -7,25 +7,20 @@ import Table from '../../components/table';
 import Button, { ButtonVariant, ButtonType } from '../../components/button';
 import Input, { InputType } from '../../components/input';
 import { getEarnings, createEarning } from '../../lib/earnings';
+import { IEarning } from '../../interfaces/earning';
 
 export default function Earning() {
-  const { data: earnings } = useSwr('/api/earnings', getEarnings);
-
-  console.log(earnings);
-
+  const { data: earnings, mutate } = useSwr('/api/earnings', getEarnings);
   const { handleSubmit, ...rest } = useForm();
   const [showModal, setShowModal] = useState(false);
   const tableHeaders = ['Date', 'Earning'];
-  const tableRows = [
-    { id: 1, date: '01/2022', value: 'R$12.000,00' },
-    { id: 2, date: '02/2022', value: 'R$12.000,00' },
-    { id: 3, date: '03/2022', value: 'R$18.000,00' },
-    { id: 4, date: '04/2022', value: 'R$8.000,00' },
-  ];
-  const tableFooter = { 'Total': 'R$50.000,00' };
-  const componentHandleSubmit = (data) => {
-    console.log(data);
+  // const tableFooter = { 'Total': 'R$50.000,00' };
+  const componentHandleSubmit = async (data) => {
+    const newEarning = await createEarning('/api/earnings', data);
+
+    mutate([...earnings, newEarning], false);
   };
+  const tableRows = earnings?.length ? earnings : [];
 
   return (
     <Fragment>
@@ -38,7 +33,11 @@ export default function Earning() {
         />
       </div>
 
-      <Table headers={tableHeaders} bodyRows={tableRows} footerRow={tableFooter} />
+      <Table<IEarning>
+        headers={tableHeaders}
+        bodyRows={tableRows}
+        // footerRow={tableFooter}
+      />
 
       <Modal open={showModal} title="New Earning" onClose={() => setShowModal(false)}>
         <FormProvider handleSubmit={handleSubmit} {...rest}>

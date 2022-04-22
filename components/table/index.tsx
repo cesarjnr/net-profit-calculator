@@ -1,13 +1,20 @@
-interface Props {
-  headers: string[];
-  bodyRows: {
-    id: number;
-    [key: string]: string | number;
-  }[];
-  footerRow?: { [key: string]: string | number };
+type BodyRow<T> = {
+  id: string;
+} & {
+  [K in keyof T]: string | number;
 }
 
-export default function Table({ headers, bodyRows, footerRow }: Props) {
+type FooterRow = {
+  [key: string]: string | number
+}
+
+type Props<T> = {
+  headers: string[];
+  bodyRows: BodyRow<T>[];
+  footerRow?: FooterRow;
+}
+
+export default function Table<T>({ headers, bodyRows, footerRow }: Props<T>) {
   const renderHeaders = () => {
     return headers.map((header) => (
       <th key={header} className="border border-primary-800 p-3 font-medium">
@@ -21,9 +28,9 @@ export default function Table({ headers, bodyRows, footerRow }: Props) {
 
       return (
         <tr key={id}>
-          {Object.values(rest).map((rowValue) => (
-            <td key={String(id) + rowValue} className="border border-primary-100 p-2">
-              {rowValue}
+          {Object.entries(rest).map(([key, value]) => (
+            <td key={id + key} className="border border-primary-100 p-2">
+              {String(value)}
             </td>
           ))}
         </tr>
