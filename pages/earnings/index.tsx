@@ -1,4 +1,4 @@
-import useSwr, { mutate } from 'swr';
+import useSwr from 'swr';
 import { Fragment, useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 
@@ -11,16 +11,39 @@ import { IEarning } from '../../interfaces/earning';
 
 export default function Earning() {
   const { data: earnings, mutate } = useSwr('/api/earnings', getEarnings);
-  const { handleSubmit, ...rest } = useForm();
+  const { handleSubmit, reset, ...rest } = useForm();
   const [showModal, setShowModal] = useState(false);
   const tableHeaders = ['Date', 'Earning'];
   // const tableFooter = { 'Total': 'R$50.000,00' };
   const componentHandleSubmit = async (data) => {
-    const newEarning = await createEarning('/api/earnings', data);
+    const newEarning = await createEarning('/api/earnings', { date: data.date, value: Number(data.value) });
 
-    mutate([...earnings, newEarning], false);
+    setShowModal(false);
+    mutate(
+      [...earnings, newEarning].sort(sortEarningsByDate),
+      false
+    );
+    reset();
   };
-  const tableRows = earnings?.length ? earnings : [];
+  const sortEarningsByDate = (a: IEarning, b: IEarning): number => {
+    console.log({ element: 'A', a, time: new Date(a.date).getTime() });
+    console.log({ element: 'B', b, time: new Date(b.date).getTime() });
+
+    const aTimestamp = new Date(a.date).getTime();
+    const bTimestamp = new Date(b.date).getTime();
+
+    if (aTimestamp < bTimestamp) {
+      return -1;
+    } else if (aTimestamp > bTimestamp) {
+      return 1;
+    } else {
+      return 0;
+    }
+  };
+  const tableRows = earnings?.length ? earnings.map((earning) => ({
+    ...earning,
+    value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(earning.value)
+  })) : [];
 
   return (
     <Fragment>
@@ -40,10 +63,10 @@ export default function Earning() {
       />
 
       <Modal open={showModal} title="New Earning" onClose={() => setShowModal(false)}>
-        <FormProvider handleSubmit={handleSubmit} {...rest}>
+        <FormProvider handleSubmit={handleSubmit} reset={reset} {...rest}>
           <form onSubmit={handleSubmit(componentHandleSubmit)}>
             <Input name='date' label='Date' type={InputType.Date} />
-            <Input name='value' label='Value (R$)' type={InputType.Text} />
+            <Input name='value' label='Value (R$)' type={InputType.Number} />
 
             <div className="flex gap-5">
               <Button

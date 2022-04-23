@@ -9,7 +9,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method === 'GET') {
     return await getEarnings(req, res);
   } else if (req.method === 'POST') {
-    console.log('POST REQUEST');
+    return await createEarning(req, res);
   } else {
     return res.status(404).send({ message: 'Route not found' });
   }
@@ -36,10 +36,21 @@ async function getEarnings(req: NextApiRequest, res: NextApiResponse): Promise<v
 
 async function createEarning(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const { date, value } = req.body;
-  // Validar a data
-  // const newEarning: IEarning = {
-  //   id: v4(),
-  //   date,
-  //   value
-  // };
+  const parsedDate = new Date(date);
+  const day = String(parsedDate.getUTCDate()).padStart(2, '0');
+  const month = String(parsedDate.getUTCMonth() + 1).padStart(2, '0');
+  const year = parsedDate.getUTCFullYear();
+  const newEarning: IEarning = {
+    id: v4(),
+    date: `${day}/${month}/${year}`,
+    value
+  };
+  const member = JSON.stringify(newEarning);
+
+  await tedisClient.zadd(
+    'earnings' ,
+    { [member]: parsedDate.getTime() }
+  );
+
+  res.status(200).json(newEarning);
 }

@@ -9,7 +9,7 @@ export async function getEarnings(url: string): Promise<IEarning[]> {
 export async function createEarning(url, data): Promise<IEarning> {
   const response = await fetch(url, {
     method: 'POST',
-    body: data,
+    body: JSON.stringify(data),
     headers: { 'Content-Type': 'application/json' }
   });
 
