@@ -7,6 +7,8 @@ import Table from '../../components/table';
 import Button, { ButtonVariant, ButtonType } from '../../components/button';
 import Input, { InputType } from '../../components/input';
 import { getEarnings, createEarning } from '../../lib/earnings';
+import { formatDate } from '../../lib/date';
+import { formatCurrency } from '../../lib/currency';
 import { IEarning } from '../../interfaces/earning';
 
 export default function Earning() {
@@ -26,9 +28,6 @@ export default function Earning() {
     reset();
   };
   const sortEarningsByDate = (a: IEarning, b: IEarning): number => {
-    console.log({ element: 'A', a, time: new Date(a.date).getTime() });
-    console.log({ element: 'B', b, time: new Date(b.date).getTime() });
-
     const aTimestamp = new Date(a.date).getTime();
     const bTimestamp = new Date(b.date).getTime();
 
@@ -42,7 +41,8 @@ export default function Earning() {
   };
   const tableRows = earnings?.length ? earnings.map((earning) => ({
     ...earning,
-    value: new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(earning.value)
+    date: formatDate(earning.date),
+    value: formatCurrency(earning.value)
   })) : [];
 
   return (

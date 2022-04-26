@@ -1,5 +1,5 @@
 export interface IEarning {
   id: string;
-  date: string;
+  date: number;
   value: number;
 }
