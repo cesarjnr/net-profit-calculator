@@ -3,7 +3,7 @@ import { Fragment, useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 
 import Modal from '../../components/modal';
-import Table from '../../components/table';
+import Table, { Header } from '../../components/table';
 import Button, { ButtonVariant, ButtonType } from '../../components/button';
 import Input, { InputType } from '../../components/input';
 import { getEarnings, createEarning } from '../../lib/earnings';
@@ -15,10 +15,8 @@ export default function Earning() {
   const { data: earnings, mutate } = useSwr('/api/earnings', getEarnings);
   const { handleSubmit, reset, ...rest } = useForm();
   const [showModal, setShowModal] = useState(false);
-  const tableHeaders = ['Date', 'Earning'];
-  // const tableFooter = { 'Total': 'R$50.000,00' };
-  const componentHandleSubmit = async (data) => {
-    const newEarning = await createEarning('/api/earnings', { date: data.date, value: Number(data.value) });
+  const componentHandleSubmit = async (formData) => {
+    const newEarning = await createEarning('/api/earnings', { date: formData.date, value: Number(formData.value) });
 
     setShowModal(false);
     mutate(
@@ -39,11 +37,21 @@ export default function Earning() {
       return 0;
     }
   };
-  const tableRows = earnings?.length ? earnings.map((earning) => ({
-    ...earning,
-    date: formatDate(earning.date),
-    value: formatCurrency(earning.value)
-  })) : [];
+  let totalEarnings = 0;
+  const tableHeaders: Header[] = [
+    { name: 'Date', columnProperty: 'date' },
+    { name: 'Earning', columnProperty: 'value' }
+  ];
+  const tableRows = earnings?.length ? earnings.map((earning) => {
+    totalEarnings += earning.value;
+
+    return {
+      ...earning,
+      date: formatDate(earning.date),
+      value: formatCurrency(earning.value)
+    };
+  }) : [];
+  const tableFooter = earnings?.length && ['Total', formatCurrency(totalEarnings)];
 
   return (
     <Fragment>
@@ -58,8 +66,8 @@ export default function Earning() {
 
       <Table<IEarning>
         headers={tableHeaders}
-        bodyRows={tableRows}
-        // footerRow={tableFooter}
+        data={tableRows}
+        footers={tableFooter}
       />
 
       <Modal open={showModal} title="New Earning" onClose={() => setShowModal(false)}>
