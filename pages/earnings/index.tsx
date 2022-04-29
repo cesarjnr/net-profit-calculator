@@ -15,6 +15,10 @@ export default function Earning() {
   const { data: earnings, mutate } = useSwr('/api/earnings', getEarnings);
   const { handleSubmit, reset, ...rest } = useForm();
   const [showModal, setShowModal] = useState(false);
+  const [totalEarnings, setTotalEarnings] = useState(earnings?.length ? earnings.reduce(
+    (currentTotalEarning, previousEarning) => currentTotalEarning + previousEarning.value,
+    0
+  ) : 0);
   const componentHandleSubmit = async (formData) => {
     const newEarning = await createEarning('/api/earnings', { date: formData.date, value: Number(formData.value) });
 
@@ -37,14 +41,11 @@ export default function Earning() {
       return 0;
     }
   };
-  let totalEarnings = 0;
   const tableHeaders: Header[] = [
     { name: 'Date', columnProperty: 'date' },
     { name: 'Earning', columnProperty: 'value' }
   ];
   const tableRows = earnings?.length ? earnings.map((earning) => {
-    totalEarnings += earning.value;
-
     return {
       ...earning,
       date: formatDate(earning.date),
@@ -55,7 +56,7 @@ export default function Earning() {
 
   return (
     <Fragment>
-      <div className="mb-5 flex justify-end">
+      <div className="flex justify-end">
         <Button
           variant={ButtonVariant.Contained}
           type={ButtonType.Button}
@@ -68,6 +69,12 @@ export default function Earning() {
         headers={tableHeaders}
         data={tableRows}
         footers={tableFooter}
+        onChangePageSize={(newPageSize) => {
+          const earningsRange = earnings.slice(0, newPageSize);
+          const newTotalEarnings = earningsRange.reduce((currentTotalEarning, previousEarning) => currentTotalEarning + previousEarning.value, 0);
+
+          setTotalEarnings(newTotalEarnings);
+        }}
       />
 
       <Modal open={showModal} title="New Earning" onClose={() => setShowModal(false)}>
