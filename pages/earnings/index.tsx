@@ -15,10 +15,9 @@ export default function Earning() {
   const { data: earnings, mutate } = useSwr('/api/earnings', getEarnings);
   const { handleSubmit, reset, ...rest } = useForm();
   const [showModal, setShowModal] = useState(false);
-  const [totalEarnings, setTotalEarnings] = useState(earnings?.length ? earnings.reduce(
-    (currentTotalEarning, previousEarning) => currentTotalEarning + previousEarning.value,
-    0
-  ) : 0);
+  const [totalEarnings, setTotalEarnings] = useState(earnings?.length ? earnings.reduce((currentTotalEarning: number, previousEarning: IEarning) => {
+    return currentTotalEarning + previousEarning.value;
+  }, 0) : 0);
   const componentHandleSubmit = async (formData) => {
     const newEarning = await createEarning('/api/earnings', { date: formData.date, value: Number(formData.value) });
 
@@ -53,6 +52,16 @@ export default function Earning() {
     };
   }) : [];
   const tableFooter = earnings?.length && ['Total', formatCurrency(totalEarnings)];
+  // const handleChangePage = (currentPageRows: object[]) => {
+  //   const currentPageEarnings = currentPageRows as { [key in keyof IEarning]: string }[];
+  //   const newTotalEarnings = currentPageEarnings.reduce((currentTotalEarning: number, previousEarning: { [key in keyof IEarning]: string }) => {
+  //     const previousEarningValue = previousEarning.value.replace(/(R\$)(\s\d*)(\.|)(\d*)(,)(\d*)/, '$2$4.$6');
+
+  //     return currentTotalEarning + Number(previousEarningValue);
+  //   }, 0);
+
+  //   setTotalEarnings(newTotalEarnings);
+  // };
 
   return (
     <Fragment>
@@ -68,13 +77,8 @@ export default function Earning() {
       <Table<IEarning>
         headers={tableHeaders}
         data={tableRows}
-        footers={tableFooter}
-        onChangePageSize={(newPageSize) => {
-          const earningsRange = earnings.slice(0, newPageSize);
-          const newTotalEarnings = earningsRange.reduce((currentTotalEarning, previousEarning) => currentTotalEarning + previousEarning.value, 0);
-
-          setTotalEarnings(newTotalEarnings);
-        }}
+        // footers={tableFooter}
+        // onChangePage={handleChangePage}
       />
 
       <Modal open={showModal} title="New Earning" onClose={() => setShowModal(false)}>

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTable, usePagination, Column } from 'react-table';
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 
@@ -13,10 +13,10 @@ type Props<T> = {
   headers: Header[];
   data: Data<T>[];
   footers?: string[];
-  onChangePageSize?: (pageSize: number) => void
+  // onChangePage?: (currentPageRows: object[]) => void
 }
 
-export default function Table<T>({ headers, data, footers, onChangePageSize }: Props<T>) {
+export default function Table<T>({ headers, data, footers, /* onChangePage */ }: Props<T>) {
   const tableHeaders: Column[] = useMemo(
     () => headers.map((header, index) => ({
       Header: header.name,
@@ -79,6 +79,13 @@ export default function Table<T>({ headers, data, footers, onChangePageSize }: P
     </tfoot>
   );
 
+  // useEffect(() => {
+  //   console.log('useEffetct');
+  //   console.log(table.page);
+
+  //   onChangePage(table.page.map(page => page.original));
+  // }, [table.page]);
+
   return data && (
     <>
       <table
@@ -103,7 +110,6 @@ export default function Table<T>({ headers, data, footers, onChangePageSize }: P
             const newPageSize = Number(e.target.value);
 
             table.setPageSize(newPageSize);
-            onChangePageSize && onChangePageSize(newPageSize);
           }}
         >
           {[10, 20, 30, 40, 50].map((pageSize) => (
@@ -113,10 +119,10 @@ export default function Table<T>({ headers, data, footers, onChangePageSize }: P
           ))}
         </select>
         <div className="flex items-center gap-6">
-          <button className="p-2 rounded-full hover:bg-gray-100">
+          <button className="p-2 rounded-full hover:bg-gray-100" onClick={() => table.previousPage()}>
             <MdKeyboardArrowLeft size="1.5em" color="rgb(107, 114, 128)" />
           </button>
-          <button className="p-2 rounded-full hover:bg-gray-100">
+          <button className="p-2 rounded-full hover:bg-gray-100" onClick={() => table.nextPage()}>
             <MdKeyboardArrowRight size="1.5em" color="rgb(107, 114, 128)" />
           </button>
         </div>
