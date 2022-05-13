@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { useTable, usePagination, Column } from 'react-table';
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 
@@ -12,21 +12,25 @@ export type Header = {
 type Props<T> = {
   headers: Header[];
   data: Data<T>[];
-  footers?: string[];
-  // onChangePage?: (currentPageRows: object[]) => void
 }
 
-export default function Table<T>({ headers, data, footers, /* onChangePage */ }: Props<T>) {
+export default function Table<T>({ headers, data }: Props<T>) {
   const tableHeaders: Column[] = useMemo(
-    () => headers.map((header, index) => ({
+    () => headers.map((header) => ({
       Header: header.name,
-      Footer: footers?.length ? footers[index] : undefined,
       accessor: header.columnProperty,
     })),
-    [headers, footers]
+    [headers]
   );
   const tableBodyRows: any = useMemo(() => data, [data]);
-  const table = useTable({ columns: tableHeaders, data: tableBodyRows, initialState: { pageSize: 10 } }, usePagination);
+  const table = useTable(
+    {
+      columns: tableHeaders,
+      data: tableBodyRows,
+      initialState: { pageSize: 10 }
+    },
+    usePagination
+  );
   const renderHeadersRow = () => {
     return table.headerGroups.map((headerGroup) => (
       <tr
@@ -49,9 +53,9 @@ export default function Table<T>({ headers, data, footers, /* onChangePage */ }:
       table.prepareRow(row);
 
       return (
-        <tr {...row.getRowProps()}>
+        <tr {...row.getRowProps()} className="divide-x">
           {row.cells.map((cell) => (
-            <td className="border border-primary-100 p-2" {...cell.getCellProps()}>
+            <td className="border-b border-primary-100 p-2" {...cell.getCellProps()}>
               {cell.render('Cell')}
             </td>
           ))}
@@ -59,37 +63,11 @@ export default function Table<T>({ headers, data, footers, /* onChangePage */ }:
       )
     });
   };
-  const renderFooterRow = () => (
-    <tfoot>
-      {table.footerGroups.map((footerGroup) => (
-        <tr
-          className="bg-primary-50 text-primary-800 text-sm font-medium"
-          {...footerGroup.getFooterGroupProps()}
-        >
-          {footerGroup.headers.map((column) => (
-            <td
-              className="border border-primary-100 p-2"
-              {...column.getFooterProps()}
-            >
-              {column.render('Footer')}
-            </td>
-          ))}
-        </tr>
-      ))}
-    </tfoot>
-  );
-
-  // useEffect(() => {
-  //   console.log('useEffetct');
-  //   console.log(table.page);
-
-  //   onChangePage(table.page.map(page => page.original));
-  // }, [table.page]);
 
   return data && (
-    <>
+    <div className="border border-primary-100 shadow-md rounded-lg my-8">
       <table
-        className="w-full my-8 table-auto border border-primary-800 shadow-md"
+        className="w-full table-auto"
         {...table.getTableBodyProps()}
       >
         <thead>
@@ -99,11 +77,9 @@ export default function Table<T>({ headers, data, footers, /* onChangePage */ }:
         <tbody className="text-primary-800 text-sm" {...table.getTableBodyProps()}>
           {renderBodyRows()}
         </tbody>
-
-        {footers?.length && renderFooterRow()}
       </table>
 
-      <div className="flex justify-end gap-20">
+      <div className="py-8 flex justify-end gap-20">
         <select
           className="py-0 border-l-0 border-t-0 border-r-0 border-b-1 border-[rgb(107,114,128)] text-[rgb(107,114,128)] focus:border-[rgb(107,114,128)] focus:shadow-none focus:ring-transparent"
           onChange={(e) => {
@@ -127,6 +103,6 @@ export default function Table<T>({ headers, data, footers, /* onChangePage */ }:
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }

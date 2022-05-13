@@ -1,4 +1,4 @@
-import { IEarning } from '../interfaces/earning';
+import { IEarning, ICreateEarning } from '../interfaces/earning';
 
 export async function getEarnings(url: string): Promise<IEarning[]> {
   const response = await fetch(url);
@@ -6,7 +6,7 @@ export async function getEarnings(url: string): Promise<IEarning[]> {
   return response.json();
 }
 
-export async function createEarning(url, data): Promise<IEarning> {
+export async function createEarning(url, data: ICreateEarning): Promise<IEarning> {
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify(data),

@@ -11,21 +11,20 @@ import { formatDate } from '../../lib/date';
 import { formatCurrency } from '../../lib/currency';
 import { IEarning } from '../../interfaces/earning';
 
+interface IEarningForm {
+  date: string;
+  value: string;
+}
+
 export default function Earning() {
   const { data: earnings, mutate } = useSwr('/api/earnings', getEarnings);
-  const { handleSubmit, reset, ...rest } = useForm();
+  const { handleSubmit, reset, ...rest } = useForm<IEarningForm>();
   const [showModal, setShowModal] = useState(false);
-  const [totalEarnings, setTotalEarnings] = useState(earnings?.length ? earnings.reduce((currentTotalEarning: number, previousEarning: IEarning) => {
-    return currentTotalEarning + previousEarning.value;
-  }, 0) : 0);
-  const componentHandleSubmit = async (formData) => {
+  const componentHandleSubmit = async (formData: IEarningForm) => {
     const newEarning = await createEarning('/api/earnings', { date: formData.date, value: Number(formData.value) });
 
     setShowModal(false);
-    mutate(
-      [...earnings, newEarning].sort(sortEarningsByDate),
-      false
-    );
+    mutate([...earnings, newEarning].sort(sortEarningsByDate), false);
     reset();
   };
   const sortEarningsByDate = (a: IEarning, b: IEarning): number => {
@@ -51,17 +50,6 @@ export default function Earning() {
       value: formatCurrency(earning.value)
     };
   }) : [];
-  const tableFooter = earnings?.length && ['Total', formatCurrency(totalEarnings)];
-  // const handleChangePage = (currentPageRows: object[]) => {
-  //   const currentPageEarnings = currentPageRows as { [key in keyof IEarning]: string }[];
-  //   const newTotalEarnings = currentPageEarnings.reduce((currentTotalEarning: number, previousEarning: { [key in keyof IEarning]: string }) => {
-  //     const previousEarningValue = previousEarning.value.replace(/(R\$)(\s\d*)(\.|)(\d*)(,)(\d*)/, '$2$4.$6');
-
-  //     return currentTotalEarning + Number(previousEarningValue);
-  //   }, 0);
-
-  //   setTotalEarnings(newTotalEarnings);
-  // };
 
   return (
     <Fragment>
@@ -73,12 +61,10 @@ export default function Earning() {
           onClick={() => setShowModal(true) }
         />
       </div>
-
+    
       <Table<IEarning>
         headers={tableHeaders}
         data={tableRows}
-        // footers={tableFooter}
-        // onChangePage={handleChangePage}
       />
 
       <Modal open={showModal} title="New Earning" onClose={() => setShowModal(false)}>

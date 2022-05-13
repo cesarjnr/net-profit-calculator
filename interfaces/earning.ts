@@ -3,3 +3,8 @@ export interface IEarning {
   date: number;
   value: number;
 }
+
+export interface ICreateEarning {
+  date: string;
+  value: number;
+}
