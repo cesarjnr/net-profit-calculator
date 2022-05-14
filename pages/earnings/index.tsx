@@ -6,7 +6,7 @@ import Modal from '../../components/modal';
 import Table, { Header } from '../../components/table';
 import Button, { ButtonVariant, ButtonType } from '../../components/button';
 import Input, { InputType } from '../../components/input';
-import { getEarnings, createEarning } from '../../lib/earnings';
+import { getEarnings, createEarning, sortEarningsByDate } from '../../lib/earnings';
 import { formatDate } from '../../lib/date';
 import { formatCurrency } from '../../lib/currency';
 import { IEarning } from '../../interfaces/earning';
@@ -26,18 +26,6 @@ export default function Earning() {
     setShowModal(false);
     mutate([...earnings, newEarning].sort(sortEarningsByDate), false);
     reset();
-  };
-  const sortEarningsByDate = (a: IEarning, b: IEarning): number => {
-    const aTimestamp = new Date(a.date).getTime();
-    const bTimestamp = new Date(b.date).getTime();
-
-    if (aTimestamp < bTimestamp) {
-      return -1;
-    } else if (aTimestamp > bTimestamp) {
-      return 1;
-    } else {
-      return 0;
-    }
   };
   const tableHeaders: Header[] = [
     { name: 'Date', columnProperty: 'date' },

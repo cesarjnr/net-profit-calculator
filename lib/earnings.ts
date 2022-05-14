@@ -15,3 +15,20 @@ export async function createEarning(url, data: ICreateEarning): Promise<IEarning
 
   return response.json();
 }
+
+export const sortEarningsByDate = (a: IEarning, b: IEarning): number => {
+  const aTimestamp = new Date(a.date).getTime();
+  const bTimestamp = new Date(b.date).getTime();
+
+  if (aTimestamp < bTimestamp) {
+    return -1;
+  } else if (aTimestamp > bTimestamp) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+export const sumEarnings = (totalEarnings: number, currentEarning: IEarning) => (
+  totalEarnings + Number(currentEarning.value)
+);
