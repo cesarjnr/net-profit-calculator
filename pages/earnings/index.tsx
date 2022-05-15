@@ -20,8 +20,11 @@ export default function Earning() {
   const { data: earnings, mutate } = useSwr('/api/earnings', getEarnings);
   const { handleSubmit, reset, ...rest } = useForm<IEarningForm>();
   const [showModal, setShowModal] = useState(false);
-  const componentHandleSubmit = async (formData: IEarningForm) => {
-    const newEarning = await createEarning('/api/earnings', { date: formData.date, value: Number(formData.value) });
+  const componentHandleSubmit = async (formData: IEarningForm): Promise<void> => {
+    const newEarning = await createEarning(
+      '/api/earnings',
+      { date: formData.date, value: Number(formData.value) }
+    );
 
     setShowModal(false);
     mutate([...earnings, newEarning].sort(sortEarningsByDate), false);
@@ -55,7 +58,11 @@ export default function Earning() {
         data={tableRows}
       />
 
-      <Modal open={showModal} title="New Earning" onClose={() => setShowModal(false)}>
+      <Modal
+        open={showModal}
+        title="New Earning"
+        onClose={() => setShowModal(false)}
+      >
         <FormProvider handleSubmit={handleSubmit} reset={reset} {...rest}>
           <form onSubmit={handleSubmit(componentHandleSubmit)}>
             <Input name='date' label='Date' type={InputType.Date} />

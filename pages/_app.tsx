@@ -5,9 +5,9 @@ import Sidebar from '../components/sidebar';
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <div className="w-screen h-screen flex">
+    <div className="min-w-full min-h-full flex">
       <Sidebar />
-      <section className="grow h-full p-5">
+      <section className="w-full p-5">
         <Component {...pageProps} />
       </section>
     </div>

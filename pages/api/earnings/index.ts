@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Tedis } from 'tedis';
 import { v4 } from 'uuid';
+
 import { IEarning } from '../../../interfaces/earning';
 
 const tedisClient = new Tedis();

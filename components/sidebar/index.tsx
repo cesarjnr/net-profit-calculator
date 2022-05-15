@@ -9,12 +9,11 @@ export default function Sidebar() {
   const menuItems: MenuItem[] = [
     { page: 'Dashboard', link: '/' },
     { page: 'Earnings', link: '/earnings'},
-    { page: 'Compensations', link: '/compensations' },
-    { page: 'Calculator', link: '/calculator' }
+    { page: 'Compensations', link: '/compensations' }
   ];
 
   return (
-    <nav className="flex flex-col bg-primary-800">
+    <nav className="h-100 flex flex-col bg-primary-800">
       <div className="grow text-2xl flex justify-center items-center text-secondary-400 font-bold">IC</div>
       <ul className="grow-[5] list-none flex flex-col text-secondary-400 text-sm">
         {menuItems.map((item) => (
