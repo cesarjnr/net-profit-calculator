@@ -6,10 +6,10 @@ import Modal from '../../components/modal';
 import Table, { Header } from '../../components/table';
 import Button, { ButtonVariant, ButtonType } from '../../components/button';
 import Input, { InputType } from '../../components/input';
-import { getEarnings, createEarning, sortEarningsByDate } from '../../lib/earnings';
-import { formatDate } from '../../lib/date';
+import { get, post } from '../../lib/request';
+import { formatDate, sortByDate } from '../../lib/date';
 import { formatCurrency } from '../../lib/currency';
-import { IEarning } from '../../interfaces/earning';
+import { ICreateEarning, IEarning } from '../../interfaces/earning';
 
 interface IEarningForm {
   date: string;
@@ -17,17 +17,17 @@ interface IEarningForm {
 }
 
 export default function Earning() {
-  const { data: earnings, mutate } = useSwr('/api/earnings', getEarnings);
+  const { data: earnings, mutate } = useSwr<IEarning[]>('/api/earnings', get);
   const { handleSubmit, reset, ...rest } = useForm<IEarningForm>();
   const [showModal, setShowModal] = useState(false);
   const componentHandleSubmit = async (formData: IEarningForm): Promise<void> => {
-    const newEarning = await createEarning(
+    const newEarning = await post<ICreateEarning, IEarning>(
       '/api/earnings',
       { date: formData.date, value: Number(formData.value) }
     );
 
     setShowModal(false);
-    mutate([...earnings, newEarning].sort(sortEarningsByDate), false);
+    mutate([...earnings, newEarning].sort(sortByDate), false);
     reset();
   };
   const tableHeaders: Header[] = [

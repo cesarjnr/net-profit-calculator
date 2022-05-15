@@ -6,10 +6,10 @@ import Modal from '../../components/modal';
 import Table, { Header } from '../../components/table';
 import Button, { ButtonVariant, ButtonType } from '../../components/button';
 import Input, { InputType } from '../../components/input';
-import { getCompensations, createCompensation, sortCompensationsByDate } from '../../lib/compensations';
-import { formatDate } from '../../lib/date';
+import { get, post } from '../../lib/request';
+import { formatDate, sortByDate } from '../../lib/date';
 import { formatCurrency } from '../../lib/currency';
-import { ICompensation } from '../../interfaces/compensation';
+import { ICompensation, ICreateCompensation } from '../../interfaces/compensation';
 
 interface ICompensationForm {
   date: string;
@@ -17,17 +17,17 @@ interface ICompensationForm {
 }
 
 export default function Compensation() {
-  const { data: compensations, mutate } = useSwr('/api/compensations', getCompensations);
+  const { data: compensations, mutate } = useSwr<ICompensation[]>('/api/compensations', get);
   const { handleSubmit, reset, ...rest } = useForm<ICompensationForm>();
   const [showModal, setShowModal] = useState(false);
   const componentHandleSubmit = async (formData: ICompensationForm): Promise<void> => {
-    const newCompensation = await createCompensation(
+    const newCompensation = await post<ICreateCompensation, ICompensation>(
       '/api/compensations',
       { date: formData.date, value: Number(formData.value) }
     );
 
     setShowModal(false);
-    await mutate([...compensations, newCompensation].sort(sortCompensationsByDate), false);
+    await mutate([...compensations, newCompensation].sort(sortByDate), false);
     reset();
   }
   const tableHeaders: Header[] = [
