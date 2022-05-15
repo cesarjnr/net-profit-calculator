@@ -51,7 +51,8 @@ export default function useDashboard() {
       })
       .reduce(sumCurrencyValues, 0);
     const neededCompensationForFactorR = (28 / 100) * earningsFromLastTwelveMonthsIncludingCurrentMonth;
-    const nextMonthCompensation = neededCompensationForFactorR - compensationsFromLastElevenMonths;
+    const currentCompensationForFactorR = neededCompensationForFactorR - compensationsFromLastElevenMonths;
+    const nextMonthCompensation = currentCompensationForFactorR >= 0 ? currentCompensationForFactorR : 0;
 
     return formatCurrency(nextMonthCompensation);
   };
