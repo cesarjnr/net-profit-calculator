@@ -7,11 +7,26 @@ import { sumCurrencyValues, formatCurrency } from '../lib/currency';
 import { IEarning } from '../interfaces/earning';
 import { ICompensation } from '../interfaces/compensation';
 
-export default function useDashboard() {
+interface UseDashboard {
+  getLastTwelveMonthsEarnings: () => string;
+  getLastTwelveMonthsCompensations: () => string;
+  getNextMonthGrossCompensation: () => string;
+  // getNextMonthNetCompensation: () => string;
+}
+interface InssTax {
+  rate: number;
+  ceiling: number;
+}
+
+export default function useDashboard(): UseDashboard {
   const { data: earnings } = useSwr<IEarning[]>('/api/earnings', get);
   const { data: compensations } = useSwr<ICompensation[]>('/api/compensations', get);
+  const inssTax: InssTax = {
+    rate: 0.11,
+    ceiling: 7087.22
+  };
 
-  const calculateLastTwelveMonthsEarnings = () => {
+  const getLastTwelveMonthsEarnings = () => {
     const sortedEarnings = earnings?.sort(sortByDate) || [];
     const earningsFromLastTwelveMonths = sortedEarnings.filter((earning) => {
       const difference = differenceInMonths(Date.now(), earning.date);
@@ -22,7 +37,7 @@ export default function useDashboard() {
 
     return formatCurrency(lastTwelveMonthsEarnings);
   };
-  const calculateLastTwelveMonthsCompensations = () => {
+  const getLastTwelveMonthsCompensations = () => {
     const sortedCompensations = compensations?.sort(sortByDate) || [];
     const compensationsFromLastTwelveMonths = sortedCompensations.filter((compensation) => {
       const difference = differenceInMonths(Date.now(), compensation.date);
@@ -33,7 +48,18 @@ export default function useDashboard() {
 
     return formatCurrency(lastTwelveMonthsCompensations);
   };
-  const calculateNextMonthCompensation = () => {
+  const getNextMonthGrossCompensation = () => {
+    const nextMonthGrossCompensation = calculateNextMonthGrossCompensation();
+
+    return formatCurrency(nextMonthGrossCompensation);
+  };
+  const getNextMonthNetCompensation = () => {
+    const nextMonthGrossCompensation = calculateNextMonthGrossCompensation();
+    const discountBaseValue = nextMonthGrossCompensation > inssTax.ceiling ? inssTax.ceiling : nextMonthGrossCompensation;
+    const nextMonthInss = inssTax.rate * discountBaseValue;
+    const nextMonthCompensationMinusInss = nextMonthGrossCompensation - nextMonthInss;
+  };
+  const calculateNextMonthGrossCompensation = () => {
     const earningsFromLastTwelveMonthsIncludingCurrentMonth = (earnings || [])
       .sort(sortByDate)
       .filter((earning) => {
@@ -54,12 +80,15 @@ export default function useDashboard() {
     const currentCompensationForFactorR = neededCompensationForFactorR - compensationsFromLastElevenMonths;
     const nextMonthCompensation = currentCompensationForFactorR >= 0 ? currentCompensationForFactorR : 0;
 
-    return formatCurrency(nextMonthCompensation);
+    return nextMonthCompensation;
   };
 
+  getNextMonthNetCompensation();
+
   return {
-    calculateLastTwelveMonthsEarnings,
-    calculateLastTwelveMonthsCompensations,
-    calculateNextMonthCompensation
+    getLastTwelveMonthsEarnings,
+    getLastTwelveMonthsCompensations,
+    getNextMonthGrossCompensation,
+    // getNextMonthNetCompensation
   };
 }
